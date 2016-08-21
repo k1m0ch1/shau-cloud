@@ -91,7 +91,7 @@ void awan( CRGBPalette16 warna, uint8_t colorIndex ){
 // 8. SHAU
 // leds[4][0], leds[5][0], leds[6][1], leds[7][1]
 
-// v0.1 crosswords without animation effect
+// v0.2 crosswords with fadeout effect
 
 void crosswords(uint8_t timedelay){
 
@@ -99,29 +99,48 @@ void crosswords(uint8_t timedelay){
     
     resetLed(timedelay);
     for(i=0;i<3;i++){ leds[7][i] = 0xffffff; } resetLed(timedelay);
+    
     for(i=0;i<6;i++){ leds[8][i] = 0xffffff; } resetLed(timedelay);
+    
     leds[0][2] = 0xffffff; leds[1][2] = 0xffffff; leds[2][3] = 0xffffff;
     leds[3][3] = 0xffffff; leds[4][4] = 0xffffff; leds[5][4] = 0xffffff;
-    resetLed(timedelay);   leds[9][1] = 0xffffff; leds[7][1] = 0xffffff; 
-    leds[5][1] = 0xffffff; leds[3][1] = 0xffffff; leds[1][1] = 0xffffff; 
+    resetLed(timedelay);
+    leds[0][2] = 0xffffff; leds[1][2] = 0xffffff; leds[2][3] = 0xffffff;
+    leds[3][3] = 0xffffff; leds[4][4] = 0xffffff; leds[5][4] = 0xffffff;
+    resetLed(timedelay);
+    
+    leds[0][2] = 0xffffff; leds[1][2] = 0xffffff; leds[2][3] = 0xffffff; 
+    leds[3][3] = 0xffffff; leds[4][4] = 0xffffff; leds[5][4] = 0xffffff;     
+    resetLed(timedelay); 
+    
+    leds[9][1] = 0xffffff; leds[7][1] = 0xffffff; leds[5][1] = 0xffffff; 
+    leds[3][1] = 0xffffff; leds[1][1] = 0xffffff; 
     resetLed(timedelay+2000); 
+    
     for(i=0;i<6;i++){ leds[10][i] = 0xffffff; } resetLed(timedelay);
+    
     leds[6][5] = 0xffffff; leds[4][5] = 0xffffff; leds[2][5] = 0xffffff;
-    leds[0][5] = 0xffffff; resetLed(timedelay)    leds[7][0] = 0xffffff;
-    leds[6][1] = 0xffffff; leds[5][1] = 0xffffff; leds[4][2] = 0xffffff;
-    leds[3][2] = 0xffffff; leds[2][3] = 0xffffff; leds[1][3] = 0xffffff;
-    resetLed(timedelay);   leds[4][0] = 0xffffff; leds[7][1] = 0xffffff;
+    leds[0][5] = 0xffffff; resetLed(timedelay);  
+    
+    leds[7][0] = 0xffffff; leds[6][1] = 0xffffff; leds[5][1] = 0xffffff; 
+    leds[4][2] = 0xffffff; leds[3][2] = 0xffffff; leds[2][3] = 0xffffff; 
+    leds[1][3] = 0xffffff;
+    resetLed(timedelay);   
+    
+    leds[4][0] = 0xffffff; leds[5][0] = 0xffffff; leds[6][1] = 0xffffff;
+    leds[7][1] = 0xffffff;
     resetLed(timedelay+2000);    
     
 }
 
-private void resetLed(uint8_t timedelay){
-    delay(timedelay);
+void resetLed(int timedelay){
     for(uint8_t i=0;i<NUM_STRIPS;i++){
         for(uint8_t j=0;j<NUM_LEDS;j++){
             leds[i][j] = 0x000000;
         }
     }
+    FastLED.show();
+    delay(timedelay);
 }
 
 const TProgmemRGBPalette16 langitsenja_p PROGMEM ={
