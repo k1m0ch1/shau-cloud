@@ -17,6 +17,15 @@ extern CRGBPalette16 langitsenja, langitbiru;
 extern const TProgmemPalette16 langitsenja_p PROGMEM;
 extern const TProgmemPalette16 langitbiru_p PROGMEM;
 
+const uint8_t BUKU[4][2]    = { { 7,0 }, { 7,1 }, { 7,2 }, { 7,3 } };
+const uint8_t ADALAH[7][2]  = { { 8,0 }, { 8,1 }, { 8,2 }, { 8,3 }, { 8,4 }, { 8,5 }. { 8,6 } };
+const uint8_t JENDELA[7][2] = { { 0,2 }, { 1,2 }, { 2,3 }, { 3,3 }, { 4,4 }, { 5,4 }, { 6,5 } };
+const uint8_t DUNIA[5][2]   = { { 9,1 }, { 7,1 }, { 5,1 }, { 3,1 }, { 1,1 } };
+const uint8_t MICLIB[6][2]  = { { 10,0 }, { 10,1 }, { 10,2 }, { 10,3 }, { 10,4 }, { 10,5 }. { 10,6 } };
+const uint8_t ALUN[4][2]    = { { 6,5 }, { 4,5 }, { 2,5 }, { 0,5 } };
+const uint8_t BANDUNG[7][2] = { { 6,1 }, { 5,1 }, { 4,2 }, { 3,2 }, { 2,3 }, { 1,3 } };
+const uint8_t SHAU[4][2]    = { { 4,0 }, { 5,0 }, { 6,1 }, { 7,1 } };
+
 void setup() {
     delay( 3000 ); // power-up safety delay
 
@@ -83,7 +92,7 @@ void awan( CRGBPalette16 warna, uint8_t colorIndex ){
 // 4. DUNIA
 // leds[9][1], leds[7][1], leds[5][1], leds[3][1], leds[1][1]
 // 5. MICLIB
-// leds[10][0-6]
+// leds[10][0-5]
 // 6. ALUN
 // leds[6][5], leds[4][5], leds[2][5], leds[0][5]
 // 7. BANDUNG
