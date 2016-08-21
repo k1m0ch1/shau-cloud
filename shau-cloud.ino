@@ -61,6 +61,40 @@ void awan( CRGBPalette16 warna, uint8_t colorIndex ){
     }
 }
 
+// leds[10] = { "M", "I", "C", "L", "I", "B" }
+// leds[9]  = { "O", "D", "I", "N", "E" }
+// leds[8]  = { "A", "D", "A", "L", "A", "H" }
+// leds[7]  = { "B", "U", "K", "U", "Q" }
+// leds[6]  = { "C", "A", "L", "Y", "D", "A" }
+// leds[5]  = { "H", "N", "E", "E", "L" }
+// leds[4]  = { "S", "L", "D", "S", "E", "L" }
+// leds[3]  = { "I", "I", "U", "D", "R" }
+// leds[2]  = { "X", "U", "V", "N", "E", "U" }
+// leds[1]  = { "M", "A", "E", "G", "Z"" }
+// leds[0]  = { "I", "N", "J", "S", "U", "N" }
+
+//sequence
+// 1. BUKU
+// leds[7][0-3]
+// 2. ADALAH
+// leds[8][0-6
+// 3. JENDELA
+// leds[0][2], leds[1][2], leds[2][3], leds[3][3], leds[4][4], leds[5][4], leds[6][5]
+// 4. DUNIA
+// leds[9][1], leds[7][1], leds[5][1], leds[3][1], leds[1][1]
+// 5. MICLIB
+// leds[10][0-6]
+// 6. ALUN
+// leds[6][5], leds[4][5], leds[2][5], leds[0][5]
+// 7. BANDUNG
+// leds[7][0], leds[6][1], leds[5][1], leds[4][2], leds[3][2], leds[2][3], leds[1][3]
+// 8. SHAU
+// leds[4][0], leds[5][0], leds[6][1], leds[7][1]
+
+void crosswords(){
+    
+}
+
 const TProgmemRGBPalette16 langitsenja_p PROGMEM ={
     0xff751a, 0xff6600, 0xff6600, 0x87ceeb,    
     0xff751a, 0xff6600, 0xff6600, 0x87ceeb,  
