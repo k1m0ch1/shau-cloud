@@ -18,10 +18,10 @@ extern const TProgmemPalette16 langitsenja_p PROGMEM;
 extern const TProgmemPalette16 langitbiru_p PROGMEM;
 
 const uint8_t BUKU[4][2]    = { { 7,0 }, { 7,1 }, { 7,2 }, { 7,3 } };
-const uint8_t ADALAH[7][2]  = { { 8,0 }, { 8,1 }, { 8,2 }, { 8,3 }, { 8,4 }, { 8,5 }. { 8,6 } };
+const uint8_t ADALAH[7][2]  = { { 8,0 }, { 8,1 }, { 8,2 }, { 8,3 }, { 8,4 }, { 8,5 }, { 8,6 } };
 const uint8_t JENDELA[7][2] = { { 0,2 }, { 1,2 }, { 2,3 }, { 3,3 }, { 4,4 }, { 5,4 }, { 6,5 } };
 const uint8_t DUNIA[5][2]   = { { 9,1 }, { 7,1 }, { 5,1 }, { 3,1 }, { 1,1 } };
-const uint8_t MICLIB[6][2]  = { { 10,0 }, { 10,1 }, { 10,2 }, { 10,3 }, { 10,4 }, { 10,5 }. { 10,6 } };
+const uint8_t MICLIB[7][2]  = { { 10,0 }, { 10,1 }, { 10,2 }, { 10,3 }, { 10,4 }, { 10,5 } };
 const uint8_t ALUN[4][2]    = { { 6,5 }, { 4,5 }, { 2,5 }, { 0,5 } };
 const uint8_t BANDUNG[7][2] = { { 6,1 }, { 5,1 }, { 4,2 }, { 3,2 }, { 2,3 }, { 1,3 } };
 const uint8_t SHAU[4][2]    = { { 4,0 }, { 5,0 }, { 6,1 }, { 7,1 } };
@@ -102,20 +102,26 @@ void awan( CRGBPalette16 warna, uint8_t colorIndex ){
 
 // v0.2 crosswords with fadeout effect
 
-void crosswords(uint8_t timedelay){
+void crosswords(int timeDelayBright, int timeDelayDark, int timeDelayPerWord){
+    
+    resetLed(timeDelayPerWord);
+    uint8_t brightness = 0;
+    uint8_t fadeAmount = 5;
+    uint8_t fadeTime = 0;
+    boolean notEnd = true;
 
-    uint8_t i=0;
-    
-    resetLed(timedelay);
-    for(i=0;i<sizeof(BUKU);i++){ leds[BUKU[i][0]][BUKU[i][1]] = 0xffffff; } resetLed(timedelay);    
-    for(i=0;i<sizeof(ADALAH);i++){ leds[ADALAH[i][0]][ADALAH[i][1]] = 0xffffff; } resetLed(timedelay);
-    for(i=0;i<sizeof(JENDELA);i++){ leds[JENDELA[i][0][JENDELA[i][0]] = 0xffffff; } resetLed(timedelay);
-    for(i=0;i<sizeof(DUNIA);i++){ leds[DUNIA[i][0][DUNIA[i][0]] = 0xffffff; } resetLed(timedelay);
-    for(i=0;i<sizeof(MICLIB);i++){ leds[MICLIB[i][0][MICLIB[i][0]] = 0xffffff; } resetLed(timedelay+2000);
-    for(i=0;i<sizeof(ALUN);i++){ leds[ALUN[i][0][ALUN[i][0]] = 0xffffff; } resetLed(timedelay);
-    for(i=0;i<sizeof(BANDUNG);i++){ leds[BANDUNG[i][0][BANDUNG[i][0]] = 0xffffff; } resetLed(timedelay);
-    for(i=0;i<sizeof(SHAU);i++){ leds[SHAU[i][0][SHAU[i][0]] = 0xffffff; } resetLed(timedelay);
-    
+    while(notEnd){
+      for(uint8_t x=0; x<sizeof(BUKU); x++){ leds[BUKU[x][0]][BUKU[x][1]].setHSV(255, 0, brightness); }
+      FastLED.show();
+      brightness += fadeAmount;
+      if(brightness == 0 || brightness == 255){ fadeAmount = -fadeAmount; }   
+      delay(20);
+      if(brightness == 0){ delay(timeDelayBright); fadeTime++; }
+      if(brightness == 255){ delay(timeDelayDark); fadeTime++; }
+      if(fadeTime == 2 ){ notEnd = false; }
+    }
+
+    resetLed(timeDelayPerWord); notEnd=true; brightness=0; fadeAmount=5; fadeTime=0;
 }
 
 void resetLed(int timedelay){
