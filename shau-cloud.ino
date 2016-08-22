@@ -12,6 +12,9 @@ CRGB leds[NUM_STRIPS][NUM_LEDS];
 CRGBPalette16 currentPalette;
 TBlendType    currentBlending;
 const uint8_t PIN_NO[] = { 8, 9, 11 };
+const uint8_t timernya = 1;
+unsigned long time;
+uint8_t lapse = 0;
 
 extern CRGBPalette16 langitsenja, langitbiru;
 extern const TProgmemPalette16 langitsenja_p PROGMEM;
@@ -29,9 +32,9 @@ const uint8_t SHAU[4][2]    = { { 4,0 }, { 5,0 }, { 6,1 }, { 7,1 } };
 void setup() {
     delay( 3000 ); // power-up safety delay
 
-//    FastLED.addLeds<LED_TYPE, 8, COLOR_ORDER>(leds[0], NUM_LEDS).setCorrection( TypicalLEDStrip );
-//    FastLED.addLeds<LED_TYPE, 9, COLOR_ORDER>(leds[1], NUM_LEDS).setCorrection( TypicalLEDStrip );
-//    FastLED.addLeds<LED_TYPE, 11, COLOR_ORDER>(leds[2], NUM_LEDS).setCorrection( TypicalLEDStrip );
+    FastLED.addLeds<LED_TYPE, 8, COLOR_ORDER>(leds[0], NUM_LEDS).setCorrection( TypicalLEDStrip );
+    FastLED.addLeds<LED_TYPE, 9, COLOR_ORDER>(leds[1], NUM_LEDS).setCorrection( TypicalLEDStrip );
+    FastLED.addLeds<LED_TYPE, 11, COLOR_ORDER>(leds[2], NUM_LEDS).setCorrection( TypicalLEDStrip );
 //    FastLED.addLeds<LED_TYPE, 8, COLOR_ORDER>(leds[3], NUM_LEDS).setCorrection( TypicalLEDStrip );
 //    FastLED.addLeds<LED_TYPE, 9, COLOR_ORDER>(leds[4], NUM_LEDS).setCorrection( TypicalLEDStrip );
 //    FastLED.addLeds<LED_TYPE, 11, COLOR_ORDER>(leds[5], NUM_LEDS).setCorrection( TypicalLEDStrip );
@@ -42,29 +45,40 @@ void setup() {
 //    FastLED.addLeds<LED_TYPE, 9, COLOR_ORDER>(leds[10], NUM_LEDS).setCorrection( TypicalLEDStrip );
 
     FastLED.setBrightness(BRIGHTNESS);    
+    Serial.begin(9600);
 }
 
 
 void loop(){
 
+    time = millis();
+    
     static uint8_t startIndex = 0;
     startIndex = startIndex + 1;
 
-    awan(langitbiru_p, startIndex);
+    Serial.println(time);
+    
+    lapse = time%3000? +lapse:lapse;
+
+    if(lapse>8){
+      awan(langitsenja_p, startIndex);
+    }else{
+      awan(langitbiru_p, startIndex);
+    }
+    //crosswords(2000, 5000, 1000);
     
     FastLED.show();
     FastLED.delay(15000 / UPDATES_PER_SECOND);
 }
 
 void awan( CRGBPalette16 warna, uint8_t colorIndex ){
-    currentPalette = langitbiru_p;           
     currentBlending = LINEARBLEND;
     
     uint8_t brightness = 255;
     
     for(uint8_t a=0;a<NUM_STRIPS;a++){
       for( uint8_t i = 0; i < NUM_LEDS; i++) {
-          leds[a][i] = ColorFromPalette( currentPalette, colorIndex, brightness, currentBlending);
+          leds[a][i] = ColorFromPalette( warna, colorIndex, brightness, currentBlending);
       }
       colorIndex += 3;
     }
@@ -111,9 +125,9 @@ void crosswords(int timeDelayBright, int timeDelayDark, int timeDelayPerWord){
     boolean notEnd = true;
 
     while(notEnd){
-      for(uint8_t x=0; x<sizeof(BUKU); x++){ leds[BUKU[x][0]][BUKU[x][1]].setHSV(255, 0, brightness); }
+      for(uint8_t x=0; x<7; x++){ leds[JENDELA[x][0]][JENDELA[x][1]].setHSV(255, 0, brightness); }
       FastLED.show();
-      brightness += fadeAmount;
+      brightness = brightness +  fadeAmount;
       if(brightness == 0 || brightness == 255){ fadeAmount = -fadeAmount; }   
       delay(20);
       if(brightness == 0){ delay(timeDelayBright); fadeTime++; }
