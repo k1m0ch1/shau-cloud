@@ -1,4 +1,7 @@
+#include <Hx711.h>
 #include <FastLED.h>
+
+Hx711 scale(A1, A0);
 
 #define LED_PIN     8
 #define NUM_LEDS    20
@@ -58,12 +61,16 @@ void loop(){
 
     Serial.println(time);
     
-    lapse = time%3000? +lapse:lapse;
+    lapse = time%3600? +lapse:lapse;
 
-    if(lapse>8){
+    if(lapse>10){
       awan(langitsenja_p, startIndex);
     }else{
       awan(langitbiru_p, startIndex);
+    }
+
+    if(scale.getGram()>3){
+      crosswords(5000, 3000, 2000);
     }
     //crosswords(2000, 5000, 1000);
     
@@ -136,6 +143,17 @@ void crosswords(int timeDelayBright, int timeDelayDark, int timeDelayPerWord){
     }
 
     resetLed(timeDelayPerWord); notEnd=true; brightness=0; fadeAmount=5; fadeTime=0;
+
+    while(notEnd){
+      for(uint8_t x=0; x<7; x++){ leds[JENDELA[x][0]][JENDELA[x][1]].setHSV(255, 0, brightness); }
+      FastLED.show();
+      brightness = brightness +  fadeAmount;
+      if(brightness == 0 || brightness == 255){ fadeAmount = -fadeAmount; }   
+      delay(20);
+      if(brightness == 0){ delay(timeDelayBright); fadeTime++; }
+      if(brightness == 255){ delay(timeDelayDark); fadeTime++; }
+      if(fadeTime == 2 ){ notEnd = false; }
+    }
 }
 
 void resetLed(int timedelay){
