@@ -3,36 +3,31 @@
 
 Hx711 scale(A1, A0);
 
-#define NUM_LEDS    114
-#define BRIGHTNESS  64
-#define LED_TYPE    WS2812B
-#define COLOR_ORDER GRB
-#define NUM_STRIPS   11
+#define BRIGHTNESS      64
+#define LED_TYPE        WS2812B
+#define COLOR_ORDER     GRB
+#define NUM_LEDS        114
+#define NUM_STRIPS      11
+#define LEDS_PERSTRIPS  19
 #define UPDATES_PER_SECOND 100
 
 CRGB leds[NUM_STRIPS][NUM_LEDS];
-CRGBPalette16 currentPalette;
+
 TBlendType    currentBlending;
-const uint8_t timernya = 1;
 unsigned long time;
 uint8_t lapse = 0;
 
-
-extern CRGBPalette16 langitsenja, langitbiru, warnadunia;
 extern const TProgmemPalette16 langitsenja_p PROGMEM;
 extern const TProgmemPalette16 langitbiru_p PROGMEM;
 extern const TProgmemPalette16 warnadunia_p PROGMEM;
-
-const uint8_t BUKU[4][2]    = { { 7,0 }, { 7,1 }, { 7,2 }, { 7,3 } };
-const uint8_t ADALAH[7][2]  = { { 8,0 }, { 8,1 }, { 8,2 }, { 8,3 }, { 8,4 }, { 8,5 }, { 8,6 } };
-const uint8_t JENDELA[7][2] = { { 0,2 }, { 1,2 }, { 2,3 }, { 3,3 }, { 4,4 }, { 5,4 }, { 6,5 } };
-const uint8_t DUNIA[5][2]   = { { 9,1 }, { 7,1 }, { 5,1 }, { 3,1 }, { 1,1 } };
-const uint8_t MICLIB[7][2]  = { { 10,0 }, { 10,1 }, { 10,2 }, { 10,3 }, { 10,4 }, { 10,5 } };
-const uint8_t ALUN[4][2]    = { { 6,5 }, { 4,5 }, { 2,5 }, { 0,5 } };
-const uint8_t BANDUNG[7][2] = { { 7,0 }, { 6,1 }, { 5,1 }, { 4, 2 }, { 3,2 }, { 2,3 }, { 1,3 } };
-const uint8_t SHAU[4][2]    = { { 4,0 }, { 5,0 }, { 6,1 }, { 7,1 } };
-
-int eeq = 0 ;
+extern const uint8_t BUKU[4][2] PROGMEM;
+extern const uint8_t ADALAH[7][2] PROGMEM;
+extern const uint8_t JENDELA[7][2] PROGMEM;
+extern const uint8_t DUNIA[5][2] PROGMEM;
+extern const uint8_t MICLIB[7][2] PROGMEM;
+extern const uint8_t ALUN[4][2] PROGMEM;
+extern const uint8_t BANDUNG[7][2] PROGMEM;
+extern const uint8_t SHAU[4][2] PROGMEM;
 
 void setup() {
     delay( 3000 ); // power-up safety delay
@@ -53,36 +48,35 @@ void setup() {
     Serial.begin(9600);
 }
 
-
 void loop(){
-
    
     static uint8_t startIndex = 0;
     startIndex = startIndex + 1;
 
     time = millis();
 
-    lapse = time%10000?lapse+1:lapse;
+    //lapse = time%10000?lapse+1:lapse;
 
     if(time<13000){
        awan(langitbiru_p, startIndex);
     }else{
       awan(warnadunia_p, startIndex);
-     // crosswords(500,500,100);
     }
 
-    if(eeq==60){
+    if(lapse==60){
       Serial.print(scale.getGram(), 1);
       Serial.println(" g");
-      if(scale.getGram()>100  || scale.getGram()<-100 ){
-        crosswords(500,500,100);
+      if(scale.getGram()>100  || scale.getGram()<-100 ){ 
+        crosswords(BUKU, 500,500,100); 
       }
-      eeq=0;
+      lapse=0;
     }
+
+    
 
     FastLED.show();
     FastLED.delay(500 / UPDATES_PER_SECOND);
-    eeq++;
+    lapse++;
 }
 
 void awan( CRGBPalette16 warna, uint8_t colorIndex ){
@@ -98,7 +92,13 @@ void awan( CRGBPalette16 warna, uint8_t colorIndex ){
     }
 }
 
-void crosswords(int timeDelayBright, int timeDelayDark, int timeDelayPerWord){
+// crosswords function
+// arguments
+// int timeDelayBright = time delay when it comes into full bright 1 sec = 1000 milisec
+// int timeDelayDark = time delay when it comes into dim bright 1 sec = 1000 milisec
+// int timeDelayPerWord = time delay when it comes into changes word, in this argument 1 sec = 2000 milisec
+
+void crosswords(uint8_t value[][2], int timeDelayBright, int timeDelayDark, int timeDelayPerWord){
     
     resetLed(timeDelayPerWord);
     uint8_t brightness = 255;
@@ -107,162 +107,10 @@ void crosswords(int timeDelayBright, int timeDelayDark, int timeDelayPerWord){
     boolean notEnd = true;
 
     while(notEnd){
-      for(uint8_t x=0; x<4; x++){ 
-        for(uint8_t y=0; y<=76;y++){
+      for(uint8_t x=0; x<sizeof(value); x++){ 
+        for(uint8_t y=(value[x][1]*LEDS_PERSTRIPS);y<((value[x][1]*LEDS_PERSTRIPS)+LEDS_PERSTRIPS); y++){
            leds[BUKU[x][0]][y] = CRGB::DarkRed; 
            leds[BUKU[x][0]][y].fadeLightBy(brightness);
-        }
-       }
-       
-      FastLED.show();
-      brightness = brightness -  fadeAmount;
-      if(brightness == 0 || brightness == 255){ fadeAmount = -fadeAmount; }   
-      delay(20);
-      if(brightness == 255){ delay(timeDelayBright); fadeTime++; }
-      if(brightness == 0){ delay(timeDelayDark); fadeTime++; }
-      if(fadeTime == 2 ){ notEnd = false; }
-    }
-
-    resetLed(timeDelayPerWord); brightness = 255; fadeAmount = 5; fadeTime = 0; notEnd = true;
-
-    while(notEnd){
-      for(uint8_t x=0; x<7; x++){ 
-        for(uint8_t y=0; y<=114;y++){
-           leds[ADALAH[x][0]][y] = CRGB::DarkRed; 
-           leds[ADALAH[x][0]][y].fadeLightBy(brightness);
-        }
-       }
-       
-      FastLED.show();
-      brightness = brightness -  fadeAmount;
-      if(brightness == 0 || brightness == 255){ fadeAmount = -fadeAmount; }   
-      delay(20);
-      if(brightness == 255){ delay(timeDelayBright); fadeTime++; }
-      if(brightness == 0){ delay(timeDelayDark); fadeTime++; }
-      if(fadeTime == 2 ){ notEnd = false; }
-    }
-
-    resetLed(timeDelayPerWord); brightness = 255; fadeAmount = 5; fadeTime = 0; notEnd = true;
-
-    while(notEnd){
-      for(uint8_t x=0; x<7; x++){ 
-        for(uint8_t y=(JENDELA[x][1]*19);y<((JENDELA[x][1]*19)+19); y++){
-           leds[JENDELA[x][0]][y] = CRGB::DarkRed; 
-           leds[JENDELA[x][0]][y].fadeLightBy(brightness);
-        }
-       }
-       
-      FastLED.show();
-      brightness = brightness -  fadeAmount;
-      if(brightness == 0 || brightness == 255){ fadeAmount = -fadeAmount; }   
-      delay(20);
-      if(brightness == 255){ delay(timeDelayBright); fadeTime++; }
-      if(brightness == 0){ delay(timeDelayDark); fadeTime++; }
-      if(fadeTime == 2 ){ notEnd = false; }
-    }
-
-    resetLed(timeDelayPerWord); brightness = 255; fadeAmount = 5; fadeTime = 0; notEnd = true;
-
-    while(notEnd){
-      for(uint8_t x=0; x<5; x++){ 
-        for(uint8_t y=(DUNIA[x][1]*19);y<((DUNIA[x][1]*19)+19); y++){
-           leds[DUNIA[x][0]][y] = CRGB::DarkRed; 
-           leds[DUNIA[x][0]][y].fadeLightBy(brightness);
-        }
-       }
-       
-      FastLED.show();
-      brightness = brightness -  fadeAmount;
-      if(brightness == 0 || brightness == 255){ fadeAmount = -fadeAmount; }   
-      delay(20);
-      if(brightness == 255){ delay(timeDelayBright); fadeTime++; }
-      if(brightness == 0){ delay(timeDelayDark); fadeTime++; }
-      if(fadeTime == 2 ){ notEnd = false; }
-    }
-
-    resetLed(timeDelayPerWord); brightness = 255; fadeAmount = 5; fadeTime = 0; notEnd = true;
-
-    while(notEnd){
-      for(uint8_t x=0; x<6; x++){ 
-        for(uint8_t y=(MICLIB[x][1]*19);y<((MICLIB[x][1]*19)+19); y++){
-           leds[MICLIB[x][0]][y] = CRGB::DarkRed; 
-           leds[MICLIB[x][0]][y].fadeLightBy(brightness);
-        }
-       }
-       
-      FastLED.show();
-      brightness = brightness -  fadeAmount;
-      if(brightness == 0 || brightness == 255){ fadeAmount = -fadeAmount; }   
-      delay(20);
-      if(brightness == 255){ delay(timeDelayBright); fadeTime++; }
-      if(brightness == 0){ delay(timeDelayDark); fadeTime++; }
-      if(fadeTime == 2 ){ notEnd = false; }
-    }
-
-    resetLed(timeDelayPerWord); brightness = 255; fadeAmount = 5; fadeTime = 0; notEnd = true;
-
-    while(notEnd){
-      for(uint8_t x=0; x<4; x++){ 
-        for(uint8_t y=(ALUN[x][1]*19);y<((ALUN[x][1]*19)+19); y++){
-           leds[ALUN[x][0]][y] = CRGB::DarkRed; 
-           leds[ALUN[x][0]][y].fadeLightBy(brightness);
-        }
-       }
-       
-      FastLED.show();
-      brightness = brightness -  fadeAmount;
-      if(brightness == 0 || brightness == 255){ fadeAmount = -fadeAmount; }   
-      delay(20);
-      if(brightness == 255){ delay(timeDelayBright); fadeTime++; }
-      if(brightness == 0){ delay(timeDelayDark); fadeTime++; }
-      if(fadeTime == 2 ){ notEnd = false; }
-    }
-
-    resetLed(timeDelayPerWord); brightness = 255; fadeAmount = 5; fadeTime = 0; notEnd = true;
-
-    while(notEnd){
-      for(uint8_t x=0; x<4; x++){ 
-        for(uint8_t y=(ALUN[x][1]*19);y<((ALUN[x][1]*19)+19); y++){
-           leds[ALUN[x][0]][y] = CRGB::DarkRed; 
-           leds[ALUN[x][0]][y].fadeLightBy(brightness);
-        }
-       }
-       
-      FastLED.show();
-      brightness = brightness -  fadeAmount;
-      if(brightness == 0 || brightness == 255){ fadeAmount = -fadeAmount; }   
-      delay(20);
-      if(brightness == 255){ delay(timeDelayBright); fadeTime++; }
-      if(brightness == 0){ delay(timeDelayDark); fadeTime++; }
-      if(fadeTime == 2 ){ notEnd = false; }
-    }
-
-    resetLed(timeDelayPerWord); brightness = 255; fadeAmount = 5; fadeTime = 0; notEnd = true;
-
-    while(notEnd){
-      for(uint8_t x=0; x<7; x++){ 
-        for(uint8_t y=(BANDUNG[x][1]*19);y<((BANDUNG[x][1]*19)+19); y++){
-           leds[BANDUNG[x][0]][y] = CRGB::DarkRed; 
-           leds[BANDUNG[x][0]][y].fadeLightBy(brightness);
-        }
-       }
-       
-      FastLED.show();
-      brightness = brightness -  fadeAmount;
-      if(brightness == 0 || brightness == 255){ fadeAmount = -fadeAmount; }   
-      delay(20);
-      if(brightness == 255){ delay(timeDelayBright); fadeTime++; }
-      if(brightness == 0){ delay(timeDelayDark); fadeTime++; }
-      if(fadeTime == 2 ){ notEnd = false; }
-    }
-
-    resetLed(timeDelayPerWord); brightness = 255; fadeAmount = 5; fadeTime = 0; notEnd = true;
-
-    while(notEnd){
-      for(uint8_t x=0; x<4; x++){ 
-        for(uint8_t y=(SHAU[x][1]*19);y<((SHAU[x][1]*19)+19); y++){
-           leds[SHAU[x][0]][y] = CRGB::DarkRed; 
-           leds[SHAU[x][0]][y].fadeLightBy(brightness);
         }
        }
        
@@ -285,6 +133,16 @@ void resetLed(int timedelay){
     FastLED.show();
     delay(timedelay);
 }
+
+//determine which position of leds will show
+const uint8_t BUKU[4][2]    PROGMEM  = { { 7,0 }, { 7,1 }, { 7,2 }, { 7,3 } };
+const uint8_t ADALAH[7][2]  PROGMEM  = { { 8,0 }, { 8,1 }, { 8,2 }, { 8,3 }, { 8,4 }, { 8,5 }, { 8,6 } };
+const uint8_t JENDELA[7][2] PROGMEM  = { { 0,2 }, { 1,2 }, { 2,3 }, { 3,3 }, { 4,4 }, { 5,4 }, { 6,5 } };
+const uint8_t DUNIA[5][2]   PROGMEM  = { { 9,1 }, { 7,1 }, { 5,1 }, { 3,1 }, { 1,1 } };
+const uint8_t MICLIB[7][2]  PROGMEM  = { { 10,0 }, { 10,1 }, { 10,2 }, { 10,3 }, { 10,4 }, { 10,5 } };
+const uint8_t ALUN[4][2]    PROGMEM  = { { 6,5 }, { 4,5 }, { 2,5 }, { 0,5 } };
+const uint8_t BANDUNG[7][2] PROGMEM  = { { 7,0 }, { 6,1 }, { 5,1 }, { 4, 2 }, { 3,2 }, { 2,3 }, { 1,3 } };
+const uint8_t SHAU[4][2]    PROGMEM  = { { 4,0 }, { 5,0 }, { 6,1 }, { 7,1 } };
 
 const TProgmemRGBPalette16 langitsenja_p PROGMEM ={
     0xff751a, 0xff6600, 0xff6600, 0x87ceeb,    
