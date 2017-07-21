@@ -55,14 +55,13 @@ void loop(){
 
     time = millis();
 
-    //lapse = time%10000?lapse+1:lapse;
-
     if(time<13000){
        awan(langitbiru_p, startIndex);
     }else{
       awan(warnadunia_p, startIndex);
     }
 
+    //remove this if you don't wanna the crosswords
     if(lapse==60){
       Serial.print(scale.getGram(), 1);
       Serial.println(" g");
@@ -70,9 +69,8 @@ void loop(){
         crosswords(BUKU, 500,500,100); 
       }
       lapse=0;
-    }
-
-    
+    } 
+    //remove untill this
 
     FastLED.show();
     FastLED.delay(500 / UPDATES_PER_SECOND);
